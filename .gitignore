@@ -34,3 +34,16 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+.vercel
+
+# claude code
+.claude/
+.playwright-cli/
+
+# local screenshots / logs
+*.png
+*.jpeg
+*.jpg
+!public/**
+dev.log

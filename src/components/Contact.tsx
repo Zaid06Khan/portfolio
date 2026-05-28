@@ -1,70 +1,207 @@
-import SectionWrapper from "./SectionWrapper";
+"use client";
+import { useState } from "react";
+import Reveal from "./Reveal";
 
-const EmailIcon = () => (
-  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-  </svg>
-);
+function SendMessageForm() {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [subject, setSubject] = useState("");
+  const [message, setMessage] = useState("");
+  const [sent, setSent] = useState(false);
+  const [error, setError] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-const LinkedInIcon = () => (
-  <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden>
-    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
-  </svg>
-);
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(false);
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, subject, message }),
+      });
+      if (!res.ok) throw new Error();
+      setSent(true);
+    } catch {
+      setError(true);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-const GitHubIcon = () => (
-  <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden>
-    <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
-  </svg>
-);
+  if (sent) {
+    return (
+      <div className="msg-form">
+        <div className="form-success">
+          <strong>Message sent!</strong>
+          Your email client should have opened. Looking forward to connecting.
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="msg-form">
+      <h3 className="msg-form-title">Send a Message</h3>
+      <form onSubmit={handleSubmit}>
+        <div className="form-row">
+          <div className="form-field">
+            <label className="form-label">Your Name</label>
+            <input
+              className="form-input"
+              type="text"
+              placeholder="Zaid Khan"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+            />
+          </div>
+          <div className="form-field">
+            <label className="form-label">Your Email</label>
+            <input
+              className="form-input"
+              type="email"
+              placeholder="you@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
+        </div>
+        <div className="form-field">
+          <label className="form-label">Subject</label>
+          <input
+            className="form-input"
+            type="text"
+            placeholder="Internship opportunity"
+            value={subject}
+            onChange={(e) => setSubject(e.target.value)}
+            required
+          />
+        </div>
+        <div className="form-field">
+          <label className="form-label">Message</label>
+          <textarea
+            className="form-textarea"
+            placeholder="Write your message..."
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            required
+          />
+        </div>
+        {error && (
+          <p style={{ color: "var(--warm)", fontSize: "0.85rem", marginBottom: "0.5rem" }}>
+            Something went wrong. Please try again or email directly.
+          </p>
+        )}
+        <button className="form-submit" type="submit" disabled={loading}>
+          <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+          </svg>
+          {loading ? "Sending…" : "Send Message"}
+        </button>
+      </form>
+    </div>
+  );
+}
 
 export default function Contact() {
   return (
-    <SectionWrapper id="contact" className="mx-auto max-w-6xl px-6 py-24 md:py-32">
-      <div className="mx-auto max-w-2xl text-center">
-        {/* Section number */}
-        <div className="mb-3 flex items-center justify-center gap-2">
-          <span className="font-mono text-xs text-[#333]">05 /</span>
-          <span className="text-xs font-semibold uppercase tracking-[0.2em] text-accent">Contact</span>
-        </div>
+    <section className="contact" id="contact">
+      <div className="wrap">
+        <Reveal className="sec-head" style={{ marginBottom: 0 }}>
+          <div className="eyebrow" style={{ justifyContent: "center" }}>
+            <span className="num">06 /</span> <span className="bar" /> Contact
+          </div>
+          <h2 className="h2">Let&apos;s <em>build</em> something.</h2>
+          <p className="lede">Open to internship opportunities in Toronto and remote. Feel free to reach out.</p>
+        </Reveal>
 
-        <h2 className="mb-6 text-3xl font-bold text-white sm:text-4xl">
-          Let&apos;s Connect
-        </h2>
-        <p className="mb-12 text-lg text-gray-400">
-          Open to internship opportunities in Toronto — let&apos;s build something.
-        </p>
+        <div className="contact-layout">
+          {/* ── Left column ── */}
+          <div className="contact-left">
+            {/* Quick Actions */}
+            <Reveal>
+              <div className="qa-label">Quick Actions</div>
+              <div className="qa-buttons">
+                <a className="qa-btn" href="/resume.pdf" target="_blank" rel="noopener noreferrer">
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M12 10v6m0 0l-3-3m3 3l3-3M3 17V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+                  </svg>
+                  Download Resume
+                </a>
+                <a className="qa-btn" href="https://linkedin.com/in/zaid-khan-a03050387" target="_blank" rel="noopener noreferrer">
+                  <svg fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29zM5.34 7.43a2.06 2.06 0 110-4.13 2.06 2.06 0 010 4.13zM7.12 20.45H3.55V9h3.57v11.45z" />
+                  </svg>
+                  LinkedIn Profile
+                </a>
+                <a className="qa-btn" href="https://github.com/Zaid06Khan" target="_blank" rel="noopener noreferrer">
+                  <svg fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.44 9.8 8.2 11.38.6.11.83-.25.83-.57 0-.28-.01-1.23-.02-2.23-3.01.55-3.79-.74-4.03-1.41-.14-.35-.72-1.41-1.23-1.7-.42-.22-1.02-.78-.02-.79.95-.01 1.62.87 1.85 1.23 1.08 1.82 2.8 1.31 3.5.99.1-.78.42-1.31.76-1.6-2.67-.3-5.46-1.34-5.46-5.93 0-1.31.47-2.39 1.23-3.23-.12-.3-.54-1.53.12-3.18 0 0 1-.32 3.3 1.23.96-.27 1.98-.4 3-.4s2.04.14 3 .4c2.3-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.77.84 1.23 1.9 1.23 3.23 0 4.6-2.8 5.62-5.48 5.93.44.37.81 1.09.81 2.22 0 1.6-.02 2.9-.02 3.3 0 .32.23.69.83.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
+                  </svg>
+                  GitHub Profile
+                </a>
+              </div>
+            </Reveal>
 
-        <div className="flex flex-wrap justify-center gap-3">
-          <a
-            href="mailto:zaid9khn@gmail.com"
-            className="flex items-center gap-2.5 rounded-full border border-[#252525] bg-[#161616] px-6 py-3 text-sm font-medium text-gray-300 transition-all duration-200 hover:-translate-y-0.5 hover:border-accent/50 hover:text-accent hover:shadow-[0_0_0_1px_rgba(0,194,168,0.3),0_8px_20px_rgba(0,0,0,0.3)]"
-          >
-            <EmailIcon />
-            zaid9khn@gmail.com
-          </a>
+            {/* Education card */}
+            <Reveal delay={100} className="edu-card" style={{ margin: 0 }}>
+              <div className="edu-mark">
+                <img
+                  src="/tmu_logo.svg"
+                  alt="Toronto Metropolitan University"
+                  className="edu-tmu-logo"
+                />
+                <span className="edu-label">Education</span>
+              </div>
+              <div className="edu-body">
+                <h3 className="edu-school">Toronto Metropolitan University</h3>
+                <p className="edu-degree">Bachelor of Commerce, <em>Business Technology Management</em></p>
+                <p className="edu-dates">Sep 2024 to Apr 2028</p>
+                <ul className="edu-marks">
+                  <li>BTM Co-op stream · building business + software fluency in parallel</li>
+                  <li>Claude Technical Architect · founding cohort, Anthropic Partner Network</li>
+                  <li>GLO-BUS Industry Champion · top performance in global strategy sim</li>
+                </ul>
+              </div>
+            </Reveal>
+          </div>
 
-          <a
-            href="https://linkedin.com/in/zaid-khan-a03050387"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-2.5 rounded-full border border-[#252525] bg-[#161616] px-6 py-3 text-sm font-medium text-gray-300 transition-all duration-200 hover:-translate-y-0.5 hover:border-accent/50 hover:text-accent hover:shadow-[0_0_0_1px_rgba(0,194,168,0.3),0_8px_20px_rgba(0,0,0,0.3)]"
-          >
-            <LinkedInIcon />
-            LinkedIn
-          </a>
+          {/* ── Right column ── */}
+          <div className="contact-right">
+            {/* Contact info */}
+            <Reveal delay={80} className="cinfo-panel">
+              <div className="cinfo-head">Contact</div>
+              <a className="cinfo-item" href="mailto:zaid9khn@gmail.com">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.6} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+                zaid9khn@gmail.com
+              </a>
+              <a className="cinfo-item" href="https://linkedin.com/in/zaid-khan-a03050387" target="_blank" rel="noopener noreferrer">
+                <svg fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29zM5.34 7.43a2.06 2.06 0 110-4.13 2.06 2.06 0 010 4.13zM7.12 20.45H3.55V9h3.57v11.45z" />
+                </svg>
+                linkedin.com/in/zaid-khan-a03050387
+              </a>
+              <a className="cinfo-item" href="https://github.com/Zaid06Khan" target="_blank" rel="noopener noreferrer">
+                <svg fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.44 9.8 8.2 11.38.6.11.83-.25.83-.57 0-.28-.01-1.23-.02-2.23-3.01.55-3.79-.74-4.03-1.41-.14-.35-.72-1.41-1.23-1.7-.42-.22-1.02-.78-.02-.79.95-.01 1.62.87 1.85 1.23 1.08 1.82 2.8 1.31 3.5.99.1-.78.42-1.31.76-1.6-2.67-.3-5.46-1.34-5.46-5.93 0-1.31.47-2.39 1.23-3.23-.12-.3-.54-1.53.12-3.18 0 0 1-.32 3.3 1.23.96-.27 1.98-.4 3-.4s2.04.14 3 .4c2.3-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.77.84 1.23 1.9 1.23 3.23 0 4.6-2.8 5.62-5.48 5.93.44.37.81 1.09.81 2.22 0 1.6-.02 2.9-.02 3.3 0 .32.23.69.83.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
+                </svg>
+                github.com/Zaid06Khan
+              </a>
+            </Reveal>
 
-          <a
-            href="https://github.com/Zaid06Khan"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-2.5 rounded-full border border-[#252525] bg-[#161616] px-6 py-3 text-sm font-medium text-gray-300 transition-all duration-200 hover:-translate-y-0.5 hover:border-accent/50 hover:text-accent hover:shadow-[0_0_0_1px_rgba(0,194,168,0.3),0_8px_20px_rgba(0,0,0,0.3)]"
-          >
-            <GitHubIcon />
-            GitHub
-          </a>
+            {/* Message form */}
+            <Reveal delay={160}>
+              <SendMessageForm />
+            </Reveal>
+          </div>
         </div>
       </div>
-    </SectionWrapper>
+      <div className="contact-rule">END · Toronto, ON</div>
+    </section>
   );
 }

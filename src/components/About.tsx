@@ -1,43 +1,103 @@
-import SectionWrapper from "./SectionWrapper";
+"use client";
+import { useRef, useEffect, useState } from "react";
+import Reveal from "./Reveal";
+import { useCounter } from "@/hooks/useCounter";
 
-const stats = [
-  { value: "3", label: "Internships" },
-  { value: "5+", label: "Projects Shipped" },
-  { value: "✦", label: "Claude Certified" },
-];
+function StatBlock({
+  value,
+  suffix,
+  label,
+  sub,
+  inView,
+}: {
+  value: number;
+  suffix: string;
+  label: string;
+  sub: string;
+  inView: boolean;
+}) {
+  const v = useCounter(value, inView, 1600);
+  return (
+    <div className="stat">
+      <span className="stat-val">
+        {Math.round(v)}{suffix}
+      </span>
+      <span className="stat-lab">
+        {label}
+        <span className="sub">{sub}</span>
+      </span>
+    </div>
+  );
+}
 
 export default function About() {
+  const ref = useRef<HTMLElement>(null);
+  const [inView, setInView] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      ([e]) => { if (e.isIntersecting) { setInView(true); io.disconnect(); } },
+      { threshold: 0.15 }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
   return (
-    <SectionWrapper id="about" className="mx-auto max-w-6xl px-6 py-24 md:py-32">
-      {/* Section number */}
-      <div className="mb-3 flex items-center gap-2">
-        <span className="font-mono text-xs text-[#333]">00 /</span>
-        <span className="text-xs font-semibold uppercase tracking-[0.2em] text-accent">About</span>
-      </div>
+    <section className="sec" id="about" ref={ref}>
+      <div className="wrap">
+        <Reveal className="sec-head">
+          <div className="eyebrow"><span className="num">00 /</span> <span className="bar" /> About</div>
+          <h2 className="h2">A student who builds <em>real things</em> and takes them seriously.</h2>
+        </Reveal>
 
-      <h2 className="mb-8 text-3xl font-bold text-white sm:text-4xl">Who I Am</h2>
+        <div className="about-grid">
+          <Reveal className="about-copy" delay={100}>
+            <p>
+              I&apos;m a <strong>Business Technology Management</strong> student at Toronto Metropolitan University. Most of my time outside of class goes into building things. Web apps, mobile apps, automation tools. I like having something real to show for my time.
+            </p>
+            <p>
+              Right now I am working on AI automations at <strong>EdVisingU</strong> and I am one of ten people selected for the founding cohort of Anthropic&apos;s <em>Claude Technical Architect</em> program. It has been a great experience and I have learned a lot from it.
+            </p>
+            <p>
+              I enjoy working where technology and business meet. I like taking an idea and turning it into something functional that people can actually use. That is what keeps me motivated to keep building.
+            </p>
+          </Reveal>
 
-      <p className="max-w-3xl text-lg leading-relaxed text-gray-400">
-        I&apos;m a Business Technology Management student at Toronto Metropolitan
-        University with a passion for building real things — AI automation
-        systems, full-stack web apps, and mobile applications. I work at the
-        intersection of business and technology, using tools like Claude, Python,
-        and React Native to ship products that actually work. Currently building
-        AI workflows at EdVisingU and always working on something new.
-      </p>
+          <Reveal className="stats" delay={250}>
+            <StatBlock value={3} suffix="" label="Internships" sub="2024 – 2026" inView={inView} />
+            <StatBlock value={6} suffix="+" label="Projects shipped" sub="Mobile · Web · AI" inView={inView} />
+            <StatBlock value={10} suffix="" label="Founding members" sub="Claude Partner Network" inView={inView} />
+          </Reveal>
+        </div>
 
-      {/* Stat cards */}
-      <div className="mt-10 grid max-w-sm grid-cols-3 gap-4">
-        {stats.map((stat) => (
-          <div
-            key={stat.label}
-            className="rounded-2xl border border-[#252525] bg-[#161616] p-5 text-center transition-colors duration-200 hover:border-accent/30"
-          >
-            <p className="mb-1 text-2xl font-bold text-accent">{stat.value}</p>
-            <p className="text-[11px] leading-snug text-gray-500">{stat.label}</p>
+        <Reveal className="facts" delay={400}>
+          <div className="facts-head">
+            <span className="facts-mark">¶</span>
+            <span>Quick facts</span>
           </div>
-        ))}
+          <dl className="facts-grid">
+            <div className="fact">
+              <dt>Location</dt>
+              <dd>Toronto, ON · open to remote</dd>
+            </div>
+            <div className="fact">
+              <dt>Education</dt>
+              <dd>Business Technology Management<span className="fact-sub">Toronto Metropolitan University</span></dd>
+            </div>
+            <div className="fact">
+              <dt>Currently</dt>
+              <dd>AI automation at <em>EdVisingU</em><span className="fact-sub">+ shipping side projects</span></dd>
+            </div>
+            <div className="fact">
+              <dt>Looking for</dt>
+              <dd>Summer 2026 internships<span className="fact-sub">Product / AI / Full-stack</span></dd>
+            </div>
+          </dl>
+        </Reveal>
       </div>
-    </SectionWrapper>
+    </section>
   );
 }
