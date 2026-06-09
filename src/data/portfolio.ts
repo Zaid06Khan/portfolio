@@ -60,6 +60,16 @@ export const projectsData: Project[] = [
     size: "w-4",
   },
   {
+    name: "ATS Resume Scanner",
+    category: "Web App",
+    stack: ["Next.js", "TypeScript", "Claude AI", "PDF.js", "Tailwind CSS"],
+    description:
+      "AI-powered resume scanner that scores and analyzes your resume against 6 major applicant tracking systems: Workday, Taleo, iCIMS, Greenhouse, Lever, and SuccessFactors.",
+    github: "https://github.com/Zaid06Khan/resume-ats-scanner",
+    visual: "chart",
+    size: "w-3",
+  },
+  {
     name: "LinkedIn Job Applicator",
     category: "Automation",
     stack: ["Python", "Selenium", "Web Automation"],
@@ -72,10 +82,10 @@ export const projectsData: Project[] = [
   {
     name: "Snake Game",
     category: "Game",
-    stack: ["Python", "Pygame"],
+    stack: ["Python", "Turtle"],
     description:
       "Classic Snake arcade game with growing snake mechanics, collision detection, real-time score tracking, and progressively increasing difficulty.",
-    github: "https://github.com/Zaid06Khan/snake-game",
+    github: "https://github.com/Zaid06Khan/OG-Snake-Game",
     visual: "snake",
     size: "w-2",
   },
